@@ -4,12 +4,14 @@ import { Picker } from '@react-native-picker/picker';
 import { Alert, Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 
+import sampleData from './sample_data.json'
+
 export default function App() {
 
   //B9x2wD3ZmG6ag7FvSxHdV2kRq2vSGcAe
 
 const [currency, setCurrency] = useState('Not selected');
-const [selectedCurrency, setSelectedCurrency] = useState();
+const [selectedCurrency, setSelectedCurrency] = useState('');
 const [sum, setSum] = useState('');
 const [endResult, setEndResult] = useState('');
 
@@ -31,10 +33,14 @@ fetch("https://api.apilayer.com/exchangerates_data/latest?symbols=GBP%2CUSD&base
   .catch(error => console.log('error', error));
 }
 
-useEffect(() => { getCurrencies() }, []);
+const getSampleData = () => {
+  setCurrency(sampleData.rates);
+}
+
+useEffect(() => { getSampleData() }, []);
 
 const getConversion = () => {
-    const endResult = sum / rates[selectedCurrency];
+    const endResult = Number(sum) / currency[selectedCurrency];
     setEndResult(`${endResult.toFixed(2)}€`);
   }
 
@@ -66,7 +72,7 @@ const getConversion = () => {
             setSelectedCurrency(itemValue)
           }>
 
-          {Object.keys(rates).sort().map(key => (<Picker.Item label={key} value={key} key={key} />))}
+          {Object.keys(currency).sort().map(key => (<Picker.Item label={key} value={key} key={key} />))}
           
         </Picker>
 
