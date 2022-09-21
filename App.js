@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Picker } from '@react-native-picker/picker';
 import { Alert, Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
@@ -31,11 +31,11 @@ fetch("https://api.apilayer.com/exchangerates_data/latest?symbols=GBP%2CUSD&base
   .catch(error => console.log('error', error));
 }
 
-//HUOM: muuta sum EUR exchange rate -laskutoimitukseksi:
-//(selectedCurrency * sum) * EUR exchange rate
+useEffect(() => { getCurrencies() }, []);
+
 const getConversion = () => {
-    const endResult = parseFloat(selectedCurrency) * parseFloat(sum);
-    setEndResult(endResult);
+    const endResult = sum / rates[selectedCurrency];
+    setEndResult(`${endResult.toFixed(2)}€`);
   }
 
   return (
@@ -65,12 +65,11 @@ const getConversion = () => {
           onValueChange={ (itemValue, itemIndex) =>
             setSelectedCurrency(itemValue)
           }>
-          <Picker.Item label='Please select currency' value='Unknown' />
-          <Picker.Item label='Dummy option' value='10' />
-          <Picker.Item label='GBP' value='0.877119' />
-          <Picker.Item label='USD' value='1.00163' />
+
+          {Object.keys(rates).sort().map(key => (<Picker.Item label={key} value={key} key={key} />))}
           
         </Picker>
+
         <Text style={{ textAlign: 'center', fontSize: 15, marginBottom: 4 }}>
           Your currency rate: { selectedCurrency }
         </Text>
